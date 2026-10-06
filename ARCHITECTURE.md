@@ -1,12 +1,17 @@
-# Architecture - Increment 1
+# Architecture - Increment 2
 
 ## Components and Connectors
-- **Source (`FileLineSource`)**: Reads the file line by line and passes each record to the pipeline via `Emitter`.
-- **Connector (`Pipeline`)**: Coordinates data flow from source to sink.
-- **Sink (`ConsoleSink`)**: Receives strings from the pipeline and prints them to standard output.
+- **Source (`FileLineSource`)**: Reads file line-by-line.
+- **Stage (`ParserStage`)**: Parses CLF string inputs into strongly-typed `LogRecord` instances. Invalid lines are counted and skipped.
+- **Connector (`Pipeline`)**: Coordinates data flow between stages.
+- **Sink (`ConsoleSink`)**: Displays formatted record strings to standard output.
 
-## Two-Box Diagram
-+--------------------+                     +--------------------+
-|   FileLineSource   | ---> [ Pipeline ] ---> |    ConsoleSink     |
-|      (Source)      |                     |       (Sink)       |
-+--------------------+                     +--------------------+
+## Extensibility Note
+`LogRecord` contains an immutable `Map attributes`. This map acts as an open extension point so future stages (weeks 5-7) can enrich records without modifying the parser.
+
+## Architecture Diagram
+
++----------------+      +---------------+      +---------------+
+| FileLineSource | ---> |  ParserStage  | ---> |  ConsoleSink  |
+|    (Source)    |      |    (Stage)    |      |    (Sink)     |
++----------------+      +---------------+      +---------------+
