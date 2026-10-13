@@ -15,3 +15,14 @@
 | FileLineSource | ---> |  ParserStage  | ---> |  ConsoleSink  |
 |    (Source)    |      |    (Stage)    |      |    (Sink)     |
 +----------------+      +---------------+      +---------------+
+
+## Increment 3 — Ordering Experiment & Trade-offs
+
+Aynı veri kümesi üzerinde filtreleme ve projeksiyon sıraları denenmiş ve şu mimari sonuçlara ulaşılmıştır:
+
+1. **Ayrıştırma Öncesi Filtreleme:** İmkânsızdır. Ham metin üzerinde alan bazlı (status >= 400 vb.) mantıksal süzme yapılamaz; verinin önce `ParserStage` ile tip güvenli `LogRecord` nesnesine dönüştürülmesi gerekir.
+2. **Projeksiyondan Önce Filtreleme (Süzme -> Projeksiyon):**
+   - **Avantajı:** Koşula uymayan kayıtlar hemen elenir. Projeksiyon aşamasına daha az veri aktarıldığı için bellek kullanımı ve CPU maliyeti düşer.
+3. **Projeksiyondan Sonra Filtreleme (Projeksiyon -> Süzme):**
+   - **Dezavantajı:** Elenecek olan veriler için boşuna alan seçimi ve bellek kopyalaması yapılır.
+   - **Risk:** Filtreleme aşaması elenmiş alanlardan birine (örneğin `status`) ihtiyaç duyuyorsa ve bu alan projeksiyonda çıkarılmışsa filtre doğru çalışmaz.

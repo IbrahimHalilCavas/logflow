@@ -6,7 +6,7 @@ import java.util.List;
 public class Pipeline {
     private final Source source;
     private final Sink sink;
-    private final List stages = new ArrayList();
+    private final List<Stage> stages = new ArrayList<>();
 
     public Pipeline(Source source, Sink sink) {
         this.source = source;
@@ -19,15 +19,17 @@ public class Pipeline {
     }
 
     public void run() {
-        for (Object s : stages) {
-            ((Stage) s).open();
+        sink.open();
+        for (Stage s : stages) {
+            s.open();
         }
 
         source.produce(item -> feed(item, 0));
 
-        for (Object s : stages) {
-            ((Stage) s).close();
+        for (Stage s : stages) {
+            s.close();
         }
+        sink.close();
     }
 
     private void feed(String item, int stageIndex) {
@@ -36,7 +38,7 @@ public class Pipeline {
             return;
         }
 
-        Stage currentStage = (Stage) stages.get(stageIndex);
+        Stage currentStage = stages.get(stageIndex);
         try {
             currentStage.process(item, output -> feed(output, stageIndex + 1));
         } catch (StageException e) {
