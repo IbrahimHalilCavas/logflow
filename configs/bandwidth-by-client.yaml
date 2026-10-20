@@ -1,0 +1,13 @@
+pipeline:
+  name: bandwidth-by-client
+  source:
+    type: file
+    params: { path: data/access-small.log }
+  stages:
+    - type: parse
+      params: { format: clf }
+    - type: project
+      params: { fields: [clientip, bytes] }
+  sink:
+    type: file
+    params: { path: data/bandwidth.txt }
