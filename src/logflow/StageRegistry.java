@@ -9,28 +9,20 @@ public class StageRegistry {
 
     static {
         register("parse", params -> new ParserStage());
+        register("validate", params -> new ValidationStage());
         
         register("filter", params -> {
-            if (params == null) {
-                throw new IllegalArgumentException("Eksik parametre! 'field', 'op' ve 'value' zorunludur.");
-            }
-            Object val = params.get("value");
-            if (val == null) {
+            if (params == null || !params.containsKey("value")) {
                 throw new IllegalArgumentException("Eksik parametre! 'value' zorunludur.");
             }
-
-            String valStr = val.toString().replaceAll("[^0-9]", "").trim();
-            if (valStr.isEmpty()) {
-                throw new IllegalArgumentException("Gecerli bir sayisal 'value' bulunamadi!");
-            }
-
+            String valStr = params.get("value").toString().replaceAll("[^0-9]", "").trim();
             int threshold = Integer.parseInt(valStr);
             return new PredicateFilterStage(r -> r.status() >= threshold);
         });
 
         register("project", params -> {
             if (params == null || !params.containsKey("fields")) {
-                throw new IllegalArgumentException("Eksik parametre! 'fields' listesi zorunludur.");
+                throw new IllegalArgumentException("Eksik parametre! 'fields' zorunludur.");
             }
             Object fieldsObj = params.get("fields");
             String[] fields = fieldsObj.toString().replace("[", "").replace("]", "").split(",");

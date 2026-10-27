@@ -1,0 +1,13 @@
+pipeline:
+  name: chaos-test
+  error_policy: DEAD_LETTER
+  dead_letter: data/dead-letter.txt
+  source:
+    type: file
+    params: { path: data/access-dirty.log }
+  stages:
+    - type: validate
+    - type: parse
+  sink:
+    type: file
+    params: { path: data/valid-output.txt }

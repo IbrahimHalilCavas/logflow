@@ -95,6 +95,7 @@ public class ParserStage implements Stage {
             out.emit(formatted);
         } catch (Exception e) {
             skippedCount++;
+            // Hata durumunda fırlatmayıp skipped sayısını artırıyoruz
         }
     }
 
